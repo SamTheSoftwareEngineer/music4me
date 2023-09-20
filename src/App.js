@@ -2,7 +2,7 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, InputGroup, FormControl, Button, Row, Card} from 'react-bootstrap'
 import { useState , useEffect } from 'react';
-import {Client_ID, Client_Secret} from './secrets.js'
+import {Client_ID, Client_Secret} from './env'
 
 const Initial_State = {
   searchInput: "",
