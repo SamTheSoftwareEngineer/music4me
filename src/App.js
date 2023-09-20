@@ -31,7 +31,7 @@ function App() {
 
   // Search Spotify
   async function search() {
-    console.log("Searching for " + searchInput);
+    // console.log("Searching for " + searchInput);
 
     var searchParameters = {
       method: 'GET',
@@ -48,7 +48,7 @@ function App() {
     var returnedAlbums = await fetch(`https://api.spotify.com/v1/artists/${artistID}/albums?include_groups=album&market=US&limit=50`, searchParameters)
       .then(response => response.json())
       .then(data => {
-        console.log(data);
+        // console.log(data);
         setAlbums(data.items);
       });
   }
@@ -73,7 +73,7 @@ function App() {
      <Container>
             <Row className='mx-2 row row-cols-4'>
               {albums.map((album, i) => {
-                console.log(album);
+                // console.log(album);
                 return (
                   <Card key={i}>
                     <Card.Img src={album.images[0].url} />
