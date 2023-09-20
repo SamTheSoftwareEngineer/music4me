@@ -2,21 +2,18 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, InputGroup, FormControl, Button, Row, Card} from 'react-bootstrap'
 import { useState , useEffect } from 'react';
+import {Client_ID, Client_Secret} from './secrets.js'
 
-
-const Client_ID = "463a7f0efab148568ba2e1d7e73d916f"
-const Client_Secret = "6acb00bb58654555a0890a18c14a5ab3"
-
-const Inintial_State = {
+const Initial_State = {
   searchInput: "",
   accessToken: "",
   albums: [],
 }
 
 function App() {
-  const [searchInput, setSearchInput] = useState(Inintial_State.searchInput);
-  const [accessToken, setAccessToken] = useState(Inintial_State.accessToken);
-  const [albums, setAlbums] = useState(Inintial_State.albums);
+  const [searchInput, setSearchInput] = useState(Initial_State.searchInput);
+  const [accessToken, setAccessToken] = useState(Initial_State.accessToken);
+  const [albums, setAlbums] = useState(Initial_State.albums);
 
   useEffect(() => {
     // API Access Token
@@ -28,17 +25,14 @@ function App() {
       },
       body: 'grant_type=client_credentials&client_id=' + Client_ID + '&client_secret=' + Client_Secret
     })
-    
-    .then (response => response.json())
-    .then (data => setAccessToken(data.access_token))
-  }, [])
+    .then(response => response.json())
+    .then(data => setAccessToken(data.access_token));
+  }, []);
 
   // Search Spotify
-
   async function search() {
     console.log("Searching for " + searchInput);
 
-    // Get request using search to get Artist ID
     var searchParameters = {
       method: 'GET',
       headers: {
@@ -47,23 +41,17 @@ function App() {
       }
     }
     
-    // Get request with Artist ID to get albums from that artist
-    var artistID = await fetch(`https://api.spotify.com/v1/search?q=` + searchInput + '&type=artist', searchParameters)
-    .then (response => (response.json())
-    .then (data => { return data.artists.items[0].id}))
+    var artistID = await fetch(`https://api.spotify.com/v1/search?q=${searchInput}&type=artist`, searchParameters)
+      .then(response => response.json())
+      .then(data => data.artists.items[0].id);
 
-    // console.log("Artist ID is " + artistID);
-
-    var returnedAlbums = await fetch("https://api.spotify.com/v1/artists/" + artistID + "/albums" + "?include_groups=album&market=US&limit=50", searchParameters)
-    .then(response => response.json())
-    .then(data =>{
-      console.log(data)
-      setAlbums(data.items);
-    });
-    
+    var returnedAlbums = await fetch(`https://api.spotify.com/v1/artists/${artistID}/albums?include_groups=album&market=US&limit=50`, searchParameters)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setAlbums(data.items);
+      });
   }
-   console.log(albums);
-   // Display those albums to the user 
 
   return (
     <div className="App">
@@ -71,33 +59,34 @@ function App() {
       <InputGroup className="mb-3" size="1g">
         <FormControl 
         placeholder="Search" 
-        type = "input"
+        type="input"
         onKeyDown={event => {
           if (event.key === 'Enter') {
-            search();}
+            search();
+          }
         }}
         onChange={event => setSearchInput(event.target.value)}
         />
-        <button onClick={() => {search()}}>Search</button>
+        <Button onClick={() => {search()}}>Search</Button>
       </InputGroup>
      </Container>
      <Container>
-      <Row className='mx-2 row row-cols-4'>
-        albums.map((album, index) => {
-          return (
-            <Card key={index}>
-              <Card.Img src="#" />
-              <Card.Body>
-                <Card.Title>Album Name Here</Card.Title>
-              </Card.Body>
-            </Card>
-          );
-        })
-        
-      </Row>
-     </Container>
-    </div>
-  );
-}
+            <Row className='mx-2 row row-cols-4'>
+              {albums.map((album, i) => {
+                console.log(album);
+                return (
+                  <Card key={i}>
+                    <Card.Img src={album.images[0].url} />
+                    <Card.Body>
+                      <Card.Title>{album.name}</Card.Title>
+                    </Card.Body>
+                  </Card>
+                );
+              })}
+            </Row>
+           </Container>
+          </div>
+        );
+      }
 
 export default App;
